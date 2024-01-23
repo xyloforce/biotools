@@ -19,6 +19,7 @@ int main(int argc, char *argv[]) {
         std::cout << "\t+i number of lines to load at a time\n";
         std::cout << "\t+d count values by bed identifier\n";
         std::cout << "\t+s count values by strand (hit & result)\n";
+        std::cout << "\t+p start/stop/mid/total\n";
         throw;
     }
     
@@ -51,6 +52,23 @@ int main(int argc, char *argv[]) {
     } catch(std::out_of_range) {
         std::cout << "won't keep strand" << std::endl;
     }
+
+    enum type_count {whole, start, stop, mid};
+    type_count count(type_count::whole);
+    try {
+        std::string val(args.at('p'));
+        if(val == "whole") {
+            count = type_count::whole;
+        } else if(val == "start") {
+            count = type_count::start;
+        } else if(val == "stop") {
+            count = type_count::stop;
+        } else if(val == "mid") {
+            count = type_count::mid;
+        }
+    } catch(std::out_of_range) {
+        std::cout << "Counting for whole interval" << std::endl;
+    }
     
     std::cout << "Loading AOE" << std::endl;
     AOE_file AOEs(AOE_filename, read);
@@ -72,18 +90,26 @@ int main(int argc, char *argv[]) {
         }
         results = AOEs.intersect(ints_to_count);
         for(const auto& entry: results) {
-            for(int i(entry.result.getStart()); i < entry.result.getEnd(); i++) {
-                std::string id("no_id");
-                char strand_source('+');
-                char strand_hit('+');
-                if(count_ids) {
-                    id = entry.result.getID();
+            std::string id("no_id");
+            char strand_source('+');
+            char strand_hit('+');
+            if(count_ids) {
+                id = entry.result.getID();
+            }
+            if(count_strand) {
+                strand_source = entry.source -> getStrand();
+                strand_hit = entry.hit -> getStrand();
+            }
+            if(count == type_count::whole) {
+                for(int i(entry.result.getStart()); i < entry.result.getEnd(); i++) {
+                    summed_values[id][strand_source][strand_hit][dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(i)] ++;
                 }
-                if(count_strand) {
-                    strand_source = entry.source -> getStrand();
-                    strand_hit = entry.hit -> getStrand();
-                }
-                summed_values[id][strand_source][strand_hit][dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(i)] ++;
+            } else if(count == type_count::start) {
+                summed_values[id][strand_source][strand_hit][dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getStart())] ++;
+            } else if(count == type_count::stop) {
+                summed_values[id][strand_source][strand_hit][dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getEnd())] ++;
+            } else if(count == type_count::mid) {
+                summed_values[id][strand_source][strand_hit][dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos((entry.hit->getStart() + entry.hit->getEnd())/2)] ++;
             }
         }
     }    

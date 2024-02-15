@@ -105,9 +105,17 @@ int main(int argc, char *argv[]) {
                     summed_values[id][strand_source][strand_hit][dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(i)] ++;
                 }
             } else if(count == type_count::start) {
-                summed_values[id][strand_source][strand_hit][dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getStart())] ++;
+                if(entry.hit -> getStrand() == '+') {
+                    summed_values[id][strand_source][strand_hit][dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getStart())] ++;
+                } else {
+                    summed_values[id][strand_source][strand_hit][dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getEnd())] ++;
+                }
             } else if(count == type_count::stop) {
-                summed_values[id][strand_source][strand_hit][dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getEnd())] ++;
+                if(entry.hit -> getStrand() == '-') {
+                    summed_values[id][strand_source][strand_hit][dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getStart())] ++;
+                } else {
+                    summed_values[id][strand_source][strand_hit][dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getEnd())] ++;
+                }
             } else if(count == type_count::mid) {
                 summed_values[id][strand_source][strand_hit][dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos((entry.hit->getStart() + entry.hit->getEnd())/2)] ++;
             }

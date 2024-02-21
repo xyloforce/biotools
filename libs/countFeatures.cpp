@@ -95,6 +95,9 @@ int main(int argc, char *argv[]) {
             char strand_hit('+');
             if(count_ids) {
                 id = entry.result.getID();
+                if(id.rfind("._", 0)) {
+                    id = id.erase(0, 2);
+                }
             }
             if(count_strand) {
                 strand_source = entry.source -> getStrand();

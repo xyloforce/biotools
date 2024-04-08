@@ -20,6 +20,7 @@ int main(int argc, char *argv[]) {
     bed_file id_source(bed_filename, read);
     id_source.readWholeFile();
     bed_file mask(mask_filename, read);
+    mask.readWholeFile();
     std::cout << "Intersecting" << std::endl;
     id_source.apply_intersect(mask);
     std::cout << "Write results" << std::endl;

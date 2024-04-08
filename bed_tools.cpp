@@ -62,6 +62,14 @@ std::unique_ptr <bio_entry> bed_file::readLine() {
     return std::make_unique <bed_entry>(entry);
 }
 
+void bed_file::apply_intersect(bio_file& file, bool stranded) {
+    std::vector <intersect_results> results(intersect(file, stranded));
+    clear();
+    for(const auto& entry: results) {
+        appendEntry(std::make_unique <bio_entry> (bed_entry(entry.result, 1000)));
+    }
+}
+
 AOE_entry::AOE_entry(std::string chr, long start, long end, std::string id, int score, char strand, long zero): bed_entry(chr, start, end, id, score, strand) {
     m_zero = zero;
 }

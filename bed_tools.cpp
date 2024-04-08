@@ -66,7 +66,7 @@ void bed_file::apply_intersect(bio_file& file, bool stranded) {
     std::vector <intersect_results> results(intersect(file, stranded));
     clear();
     for(const auto& entry: results) {
-        appendEntry(std::make_unique <bio_entry> (bed_entry(entry.result, 1000)));
+        appendEntry(std::make_unique <bed_entry> (bed_entry(entry.result, 1000)));
     }
 }
 

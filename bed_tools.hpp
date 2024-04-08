@@ -23,7 +23,7 @@ class bed_file: public bio_file {
     // functions
         virtual std::unique_ptr <bio_entry> readLine();
         void appendVector(std::vector <std::shared_ptr <bio_entry>>& entries);
-        void apply_intersect(bio_file& file, bool stranded = false);
+        void apply_intersect(bio_file& file, bool stranded = false, id_status status = both);
 
     private:
         // std::vector <std::unique_ptr<bed_entry>> m_content;
@@ -54,7 +54,7 @@ class AOE_file: public bio_file {
 
     // functions
         virtual std::unique_ptr <bio_entry> readLine();
-        void apply_intersect(bio_file& file, bool stranded = false);
+        void apply_intersect(bio_file& file, bool stranded = false, id_status status = both);
         // std::vector <AOE_entry> intersect(bio_file& file, bool stranded = false);
 
     private:

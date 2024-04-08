@@ -32,8 +32,8 @@ class bio_file {
         virtual void readWholeFile();
         virtual void writeToFile(); // write a full array of bio_entries
         bool remainToRead() const;
-        std::vector <intersect_results> intersect(const bio_file& file, bool stranded = false);
-        virtual void apply_intersect(bio_file& file, bool stranded = false);
+        std::vector <intersect_results> intersect(const bio_file& file, bool stranded = false, id_status status = both);
+        virtual void apply_intersect(bio_file& file, bool stranded = false, id_status status = both);
         void writeString(std::string value);
         virtual void appendEntry(std::unique_ptr <bio_entry> entry);
         void typeToWrite(const std::string filename);

@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
     bed_file mask(mask_filename, read);
     mask.readWholeFile();
     std::cout << "Intersecting" << std::endl;
-    id_source.apply_intersect(mask);
+    id_source.apply_intersect(mask, false, source);
     std::cout << "Write results" << std::endl;
     id_source.typeToWrite(output_filename);
     id_source.writeToFile();

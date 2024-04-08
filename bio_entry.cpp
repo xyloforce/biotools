@@ -77,18 +77,18 @@ bool bio_entry::operator==(const bio_entry& entry) const {
            m_id == entry.getID();
 }
 
-intersect_results bio_entry::intersect(const bio_entry *entry, bool stranded) {
+intersect_results bio_entry::intersect(const bio_entry *entry, bool stranded, id_status status) {
     bio_entry result;
     if(entry -> getChr() == m_chr) {
         if(entry -> getStrand() == m_strand || !stranded) {
-            std::string new_id("");
-            if(m_id != "." && entry -> getID() != ".") {
+            std::string new_id(".");
+            if(status == both) {
                new_id = m_id + "_" + entry -> getID();
             }
-            else if(m_id != ".") {
+            else if(status == source) {
                 new_id = m_id;
             }
-            else if(entry -> getID() != ".") {
+            else if(status == hit) {
                 new_id = entry -> getID();
             }
             if(entry -> getStart() >= m_start && entry -> getEnd() <= m_end) {

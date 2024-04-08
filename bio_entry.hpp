@@ -3,6 +3,7 @@
 #include <memory>
 
 struct intersect_results;
+enum id_status {source, hit, both};
 
 class bio_entry {
     public:
@@ -29,7 +30,7 @@ class bio_entry {
 
         // functions
         virtual std::string getString() const;
-        virtual intersect_results intersect(const bio_entry *entry, bool stranded);
+        virtual intersect_results intersect(const bio_entry *entry, bool stranded, id_status status = both);
 
     protected:
         std::string m_chr;

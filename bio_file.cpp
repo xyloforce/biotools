@@ -93,7 +93,7 @@ bool bio_file::remainToRead() const {
     return !m_input_stream.eof();
 }
 
-std::vector <intersect_results> bio_file::intersect(const bio_file& file, bool stranded) {
+std::vector <intersect_results> bio_file::intersect(const bio_file& file, bool stranded, id_status status) {
     std::vector <intersect_results> results;
     for(const auto& pair: m_indexes) { // pair chr : pointers
         try {
@@ -107,7 +107,7 @@ std::vector <intersect_results> bio_file::intersect(const bio_file& file, bool s
                 B = vals.size() - 1;
                 while(A <= B && !found) {
                     index2 = int((A+B)/2);
-                    intersect_results intersected_entry(entry -> intersect(vals[index2], stranded));
+                    intersect_results intersected_entry(entry -> intersect(vals[index2], stranded, status));
                     if(intersected_entry.result == bio_entry()) {
                         if((*entry) < *(vals[index2])) {
                             B = index2 - 1;
@@ -117,7 +117,7 @@ std::vector <intersect_results> bio_file::intersect(const bio_file& file, bool s
                     } else { // we got a hit, is it the only hit ?
                         results.push_back(intersected_entry);
                         for(int i(index2 - 1); i > 0; i --) {
-                            intersect_results intersected_entry(entry -> intersect(vals[i], stranded));
+                            intersect_results intersected_entry(entry -> intersect(vals[i], stranded, status));
                             if(intersected_entry.result == bio_entry()) {
                                 break;
                             } else {
@@ -125,7 +125,7 @@ std::vector <intersect_results> bio_file::intersect(const bio_file& file, bool s
                             }
                         }
                         for(int i(index2 + 1); i < vals.size(); i ++) {
-                            intersect_results intersected_entry(entry -> intersect(vals[i], stranded));
+                            intersect_results intersected_entry(entry -> intersect(vals[i], stranded, status));
                             if(intersected_entry.result == bio_entry()) {
                                 break;
                             } else {
@@ -143,8 +143,8 @@ std::vector <intersect_results> bio_file::intersect(const bio_file& file, bool s
     return results;
 }
 
-void bio_file::apply_intersect(bio_file& file, bool stranded) {
-    std::vector <intersect_results> results(intersect(file, stranded));
+void bio_file::apply_intersect(bio_file& file, bool stranded, id_status status) {
+    std::vector <intersect_results> results(intersect(file, stranded, status));
     clear(); // ATTENTION ICI ON VIDE LE TABLEAU DONC SOURCE NE POINTE PLUS VERS RIEN
     for(const auto& entry: results) {
         appendEntry(std::make_unique <bio_entry> (entry.result));

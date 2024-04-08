@@ -62,8 +62,8 @@ std::unique_ptr <bio_entry> bed_file::readLine() {
     return std::make_unique <bed_entry>(entry);
 }
 
-void bed_file::apply_intersect(bio_file& file, bool stranded) {
-    std::vector <intersect_results> results(intersect(file, stranded));
+void bed_file::apply_intersect(bio_file& file, bool stranded, id_status status) {
+    std::vector <intersect_results> results(intersect(file, stranded, status));
     clear();
     for(const auto& entry: results) {
         appendEntry(std::make_unique <bed_entry> (bed_entry(entry.result, 1000)));
@@ -150,8 +150,8 @@ void bed_file::appendVector(std::vector <std::shared_ptr <bio_entry>>& entries) 
     }
 }
 
-void AOE_file::apply_intersect(bio_file& file, bool stranded) {
-    std::vector <intersect_results> results(intersect(file, stranded));
+void AOE_file::apply_intersect(bio_file& file, bool stranded, id_status status) {
+    std::vector <intersect_results> results(intersect(file, stranded, status));
     std::vector <std::unique_ptr <bio_entry>> entries;
     for(const auto& entry: results) {
         entries.push_back(std::make_unique <AOE_entry> (AOE_entry(entry.result, dynamic_cast <AOE_entry*>(entry.source) -> getScore(), dynamic_cast <AOE_entry*>(entry.source) -> getZero())));

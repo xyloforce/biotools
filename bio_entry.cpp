@@ -36,6 +36,18 @@ std::string bio_entry::getID() const {
     return m_id;
 }
 
+void bio_entry::setID(std::string id) {
+    m_id = id;
+}
+
+void bio_entry::setStart(int start) {
+    m_start = start;
+}
+
+void bio_entry::setEnd(int end)  {
+    m_end = end;
+}
+
 std::string bio_entry::getString() const {
     return m_chr + "_" + std::to_string(m_start) + "_" + std::to_string(m_end) + "_" + std::string(1, m_strand);
 }
@@ -69,14 +81,24 @@ intersect_results bio_entry::intersect(const bio_entry *entry, bool stranded) {
     bio_entry result;
     if(entry -> getChr() == m_chr) {
         if(entry -> getStrand() == m_strand || !stranded) {
+            std::string new_id("");
+            if(m_id != "." && entry -> getID() != ".") {
+               new_id = m_id + "_" + entry -> getID();
+            }
+            else if(m_id != ".") {
+                new_id = m_id;
+            }
+            else if(entry -> getID() != ".") {
+                new_id = entry -> getID();
+            }
             if(entry -> getStart() >= m_start && entry -> getEnd() <= m_end) {
-                result = bio_entry(m_chr, entry -> getStart(), entry -> getEnd(), m_strand, m_id + "_" + entry -> getID());
+                result = bio_entry(m_chr, entry -> getStart(), entry -> getEnd(), m_strand, new_id);
             } else if(entry -> getStart() >= m_start && entry -> getStart() < m_end && entry -> getEnd() > m_end) {
-                result = bio_entry(m_chr, entry -> getStart(), m_end, m_strand, m_id + "_" + entry -> getID());
+                result = bio_entry(m_chr, entry -> getStart(), m_end, m_strand, new_id);
             } else if(entry -> getStart() < m_start && entry -> getEnd() > m_start && entry -> getEnd() <= m_end) {
-                result = bio_entry(m_chr, m_start, entry -> getEnd(), m_strand, m_id + "_" + entry -> getID());
+                result = bio_entry(m_chr, m_start, entry -> getEnd(), m_strand, new_id);
             } else if(entry -> getStart() <= m_start && entry -> getEnd() > m_start && entry -> getStart() < m_end && entry -> getEnd() >= m_end) {
-                result = bio_entry(m_chr, m_start, m_end, m_strand, m_id + "_" + entry -> getID());
+                result = bio_entry(m_chr, m_start, m_end, m_strand, new_id);
             }
         }
     }

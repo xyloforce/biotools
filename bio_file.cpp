@@ -145,7 +145,7 @@ std::vector <intersect_results> bio_file::intersect(const bio_file& file, bool s
 
 void bio_file::apply_intersect(bio_file& file, bool stranded) {
     std::vector <intersect_results> results(intersect(file, stranded));
-    clear();
+    clear(); // ATTENTION ICI ON VIDE LE TABLEAU DONC SOURCE NE POINTE PLUS VERS RIEN
     for(const auto& entry: results) {
         appendEntry(std::make_unique <bio_entry> (entry.result));
     }

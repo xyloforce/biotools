@@ -17,6 +17,11 @@ class bio_entry {
         char getStrand() const;
         std::string getID() const;
         int getSize() const;
+
+        // setters
+        void setID(std::string id);
+        void setStart(int start);
+        void setEnd(int end);
         
         // operators
         bool operator == (const bio_entry& entry) const;

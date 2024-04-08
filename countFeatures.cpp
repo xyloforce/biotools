@@ -65,6 +65,9 @@ int main(int argc, char *argv[]) {
             count = type_count::stop;
         } else if(val == "mid") {
             count = type_count::mid;
+        } else {
+            std::cout << val << " : invalid option" << std::endl;
+            throw std::invalid_argument("change p parameter");
         }
     } catch(std::out_of_range) {
         std::cout << "Counting for whole interval" << std::endl;

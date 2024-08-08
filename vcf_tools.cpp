@@ -71,7 +71,11 @@ std::unique_ptr <bio_entry> vcf_file::readLine() {
     std::vector <std::string> line = readBioLine('\t');
     if(line.size() == 8 && line.at(0)[0] != '#') {
             chr = line.at(0);
-        start = std::stol(line.at(1)) - 1;
+        try {
+            start = std::stol(line.at(1)) - 1;
+        } catch(std::invalid_argument) {
+            std::cout << line.at(1) << std::endl;
+        }
         end = start + 1;
         id = line.at(2);
         ref = line.at(3);

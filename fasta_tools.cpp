@@ -113,7 +113,8 @@ char fasta_entry::getBase(int pos) const {
     try {
         return toupper(m_sequence.at(pos));
     } catch(std::out_of_range) {
-        std::cout << "position " + std::to_string(pos) + " does not exist in sequence" << std::endl;
+        std::cout << "position " + std::to_string(pos) + " does not exist in " << m_chr << std::endl;
+        std::cout << "max size : " << m_sequence.length() << std::endl;
         throw;
     }
 }

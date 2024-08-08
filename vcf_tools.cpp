@@ -74,7 +74,8 @@ std::unique_ptr <bio_entry> vcf_file::readLine() {
         try {
             start = std::stol(line.at(1)) - 1;
         } catch(std::invalid_argument) {
-            std::cout << line.at(1) << std::endl;
+            std::cout << "Invalid conversion : " << line.at(1) << std::endl;
+            throw;
         }
         end = start + 1;
         id = line.at(2);

@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
     bool ok(true);
     vcf_entry* vcf_converted(0);
     std::unique_ptr <bio_entry> entry;
-    int valid(0), invalid(0), out_of_bounds(0);
+    int valid(0), invalid(0), out_of_bounds(0), non_attributed(0);
 
     while(mutations.remainToRead()) {
         ok = true;
@@ -45,20 +45,25 @@ int main(int argc, char* argv[]) {
             std::cout << "skipped a empty entry, probably whiteline at the eof" << std::endl;
         }
         if(ok) {
-            fasta_entry* fasta_converted = dynamic_cast <fasta_entry*> (input_fasta.getEntriesByChr(vcf_converted -> getChr())[0]);
             try {
-                if(fasta_converted -> getBase(vcf_converted -> getStart()) == vcf_converted -> getRef()[0]) {
-                    valid ++;
-                    output_file.writeBioLine(*vcf_converted);
-                } else {
-                    invalid ++;
+                fasta_entry* fasta_converted = dynamic_cast <fasta_entry*> (input_fasta.getEntriesByChr(vcf_converted -> getChr())[0]);
+                try {
+                    if(fasta_converted -> getBase(vcf_converted -> getStart()) == vcf_converted -> getRef()[0]) {
+                        valid ++;
+                        output_file.writeBioLine(*vcf_converted);
+                    } else {
+                        invalid ++;
+                    }
+                } catch(std::out_of_range) {
+                    out_of_bounds ++;
                 }
             } catch(std::out_of_range) {
-                out_of_bounds ++;
+                non_attributed ++;
             }
         }
     }
     std::cout << "Valid : " << valid << std::endl;
     std::cout << "Invalid : " << invalid << std::endl;
     std::cout << "Out of bounds : " << out_of_bounds << std::endl;
+    std::cout << "Chromosome non present in the genome : " << non_attributed << std::endl;
 }

@@ -40,9 +40,9 @@ int main(int argc, char* argv[]) {
             if(!vcf_converted) {
                 throw std::bad_cast();
             }
-        } catch(std::out_of_range) {
+        } catch(const std::out_of_range& e) {
             ok = false;
-            std::cout << "skipped a empty entry, probably whiteline at the eof" << std::endl;
+            std::cout << "invalid line: " << e.what() << std::endl;
         }
         if(ok) {
             try {

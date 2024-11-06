@@ -67,55 +67,58 @@ std::unique_ptr <bio_entry> vcf_file::readLine() {
     char tchar('\0');
     int qual(0);
     bool isKey(true);
-
     std::vector <std::string> line = readBioLine('\t');
-    if(line.size() >= 8 && line.at(0)[0] != '#') {
+    if(line.at(0)[0] != '#') {
+        if(line.size() >= 8) {
             chr = line.at(0);
-        try {
-            start = std::stol(line.at(1)) - 1;
-        } catch(std::invalid_argument) {
-            std::cout << "Invalid conversion : " << line.at(1) << std::endl;
-            throw;
-        }
-        end = start + 1;
-        id = line.at(2);
-        ref = line.at(3);
-        for(int i(0); i < line.at(4).size(); i++) {
-            tchar = line.at(4)[i];
-            if(tchar != ';' && tchar != ' ') {
-                alt[alt.size() - 1] += tchar;
+            try {
+                start = std::stol(line.at(1)) - 1;
+            } catch(std::invalid_argument) {
+                std::cout << "Invalid conversion : " << line.at(1) << "\r";
+                throw;
             }
-        }
-        if(line.at(5) != ".") {
-            qual = std::stoi(line.at(5));       
-        } else {
-            qual = 0;
-        }
-        filter = line.at(6);
-        for(int i(0); i < line.at(7).size(); i++) {
-            tchar = line.at(7)[i];
-            if(tchar != ' ') { // skip whitespaces
-                if(tchar != ';') { // if it is, need to reset tkey/tval
-                    if(tchar != '=') { // change from key to val
-                        if(isKey) {
-                            t_key += tchar;
-                        } else {
-                            t_value += tchar;
-                        }
-                    } else {
-                        isKey = false;
-                    }
-                } else {
-                    infos[t_key] = t_value;
-                    t_key = "";
-                    t_value = "";
-                    isKey = true;
+            end = start + 1;
+            id = line.at(2);
+            ref = line.at(3);
+            for(int i(0); i < line.at(4).size(); i++) {
+                tchar = line.at(4)[i];
+                if(tchar != ';' && tchar != ' ') {
+                    alt[alt.size() - 1] += tchar;
                 }
             }
+            if(line.at(5) != ".") {
+                qual = std::stoi(line.at(5));       
+            } else {
+                qual = 0;
+            }
+            filter = line.at(6);
+            for(int i(0); i < line.at(7).size(); i++) {
+                tchar = line.at(7)[i];
+                if(tchar != ' ') { // skip whitespaces
+                    if(tchar != ';') { // if it is, need to reset tkey/tval
+                        if(tchar != '=') { // change from key to val
+                            if(isKey) {
+                                t_key += tchar;
+                            } else {
+                                t_value += tchar;
+                            }
+                        } else {
+                            isKey = false;
+                        }
+                    } else {
+                        infos[t_key] = t_value;
+                        t_key = "";
+                        t_value = "";
+                        isKey = true;
+                    }
+                }
+            }
+            return std::make_unique <vcf_entry> (vcf_entry(chr, start, end, id, ref, alt, qual, filter, infos));
+        } else {
+            throw(std::out_of_range("line doesn't have the right number of elements : " + std::to_string(line.size())));
         }
-        return std::make_unique <vcf_entry> (vcf_entry(chr, start, end, id, ref, alt, qual, filter, infos));
     } else {
-        throw(std::out_of_range("line doesn't have the right number of elements : " + std::to_string(line.size())));
+        throw(std::out_of_range("skipped comment line"));
     }
 }
 

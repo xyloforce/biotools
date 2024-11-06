@@ -48,9 +48,10 @@ void bio_file::readWholeFile() {
             m_content.push_back(std::move(readLine()));
             m_indexes[m_content.at(i) -> getChr()].push_back(m_content.at(i).get()); // store a copy of the pointer for easy access
             i ++;
-        } catch(std::logic_error e) {
+        } catch(const std::out_of_range& e) {
             if(!warned) {
-                std::cout << "ignored empty line at position " << getLine() << std::endl;
+                std::cout << "ignored line at position " << getLine() << std::endl;
+                std::cout << "invalid line: " << e.what() << std::endl;
                 warned = true;
             } else {
                 std::cout << e.what() << std::endl;
@@ -260,8 +261,9 @@ void bio_file::eraseAndLoadBlock(int amount) {
     while(remainToRead() && amount > amount_loaded) {
         try  {
             appendEntry(readLine());
-        } catch(std::out_of_range) {
-            std::cout << "ignored empty line at position " << getLine() << std::endl;
+        } catch(const std::out_of_range& e) {
+            std::cout << "ignored line at position " << getLine() << std::endl;
+            std::cout << "invalid line: " << e.what() << std::endl;
         }
         amount_loaded ++;
         if(amount_loaded % 100 == 0) {

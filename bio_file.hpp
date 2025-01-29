@@ -6,12 +6,12 @@
 #include <map>
 #include "bio_entry.hpp"
 
-enum open_type {read, write};
+enum open_type {read, write, none};
 
 class bio_file {
     public:
         bio_file(std::string filename, open_type type);
-
+        bio_file();
     // getters
         std::vector <bio_entry*> getEntriesByChr(const std::string chr) const;
         std::vector <bio_entry*> getEntries() const; 
@@ -36,7 +36,8 @@ class bio_file {
         virtual void apply_intersect(bio_file& file, bool stranded = false, id_status status = both);
         void writeString(std::string value);
         virtual void appendEntry(std::unique_ptr <bio_entry> entry);
-        void typeToWrite(const std::string filename);
+        void typeToWrite(const std::string filename = "");
+        void typeToRead(const std::string filename);
         void clear();
         void eraseAndLoadBlock(int amount = 10000);
 

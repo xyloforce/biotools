@@ -107,7 +107,7 @@ std::unique_ptr <bio_entry> AOE_file::readLine() {
             } else if(values.at(5)[0] == '+' || values.at(5)[0] == '-') {
                 strand = values.at(5)[0];
             } else {
-                throw std::domain_error("not a correct value : " + std::string(1, values.at(5)[0]));
+                throw std::domain_error("strand incorrectly defined : not a correct value : " + std::string(1, values.at(5)[0]));
             } // correct strand info for AOE files
             int score(0);
             try {

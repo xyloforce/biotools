@@ -13,7 +13,14 @@ bio_file::bio_file(std::string filename, open_type type) {
         case write:
             createFile(filename, m_output_stream);
             break;
+        case none:
+            // do nothing bc its essentially unset
+            break;
     }
+}
+
+bio_file::bio_file() {
+    m_type = none;
 }
 
 std::vector <std::string> bio_file::readBioLine(char delim) { // read one line and return an array of values
@@ -45,7 +52,7 @@ void bio_file::readWholeFile() {
             if(i % 100 == 0) {
                 std::cout << "Read " << i << " entries\r";
             }
-            m_content.push_back(std::move(readLine()));
+            m_content.push_back(readLine());
             m_indexes[m_content.at(i) -> getChr()].push_back(m_content.at(i).get()); // store a copy of the pointer for easy access
             i ++;
         } catch(const std::out_of_range& e) {
@@ -59,6 +66,8 @@ void bio_file::readWholeFile() {
                 std::cout << "more than one empty line: format is probably incorrect" << std::endl;
                 throw;
             }
+        } catch(const std::invalid_argument) {
+            // nothing : skipped comment line
         }
     }
 }
@@ -224,10 +233,24 @@ void bio_file::appendEntry(std::unique_ptr <bio_entry> entry) {
 }
 
 void bio_file::typeToWrite(const std::string filename) {
-    m_input_stream.close();
+    if(m_type == read) {
+        m_input_stream.close();
+    }
     createFile(filename, m_output_stream);
     m_type = write;
     m_filename = filename;
+}
+
+void bio_file::typeToRead(const std::string filename) {
+    if(m_type == none) {
+        if(filename != "") {
+            m_filename = filename;
+        } else if(m_filename == "") {
+            throw std::invalid_argument("forgot to set value for filename, can't set it to inexistant file");
+        }
+    }
+    m_type = read;
+    openFile(m_filename, m_input_stream);
 }
 
 std::vector <std::string> bio_file::getChrs() const {

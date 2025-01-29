@@ -27,8 +27,9 @@ class vcf_entry: public bio_entry {
 class vcf_file: public bio_file {
     public:
         vcf_file(std::string filename, open_type type);
-
+        vcf_file();
     // functions
         virtual std::unique_ptr <bio_entry> readLine();
+        void typeToWrite(std::string filename);
         void eraseAndLoad();
 };

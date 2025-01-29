@@ -16,5 +16,5 @@ add_executable(intersectKeepingNames.bin intersectKeepingNames.cpp)
 add_executable(validateMuts.bin validateMuts.cpp)
 
 target_link_libraries(countFeatures.bin PUBLIC bed_tools tools)
-target_link_libraries(intersectKeepingNames.bin PUBLIC bed_tools tools)
+target_link_libraries(intersectKeepingNames.bin PUBLIC vcf_tools bed_tools tools)
 target_link_libraries(validateMuts.bin PUBLIC vcf_tools fasta_tools tools)

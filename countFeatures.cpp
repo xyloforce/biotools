@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
         std::cout << "\t+i number of lines to load at a time\n";
         std::cout << "\t+d count values by bed identifier\n";
         std::cout << "\t+s count values by strand (hit & result)\n";
-        std::cout << "\t+p start/stop/mid/total\n";
+        std::cout << "\t+p start/stop/mid/whole\n";
         throw;
     }
     
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
         std::cout << "won't keep strand" << std::endl;
     }
 
-    enum type_count {whole, start, stop, mid};
+    enum type_count {whole, start, stop, mid}; // what shall we count : full interval ? only start / stop ? Only the middle ?
     type_count count(type_count::whole);
     try {
         std::string val(args.at('p'));

@@ -8,7 +8,19 @@ vcf_file::vcf_file(std::string filename, open_type type): bio_file(filename, typ
     } else if(type == read) {
         readBioLine('\t');
         readBioLine('\t');
+    } else if(type == none) {
+        // nothing bc the point is that it's unset
     }
+}
+
+vcf_file::vcf_file(): bio_file() {
+
+}
+
+void vcf_file::typeToWrite(const std::string filename) {
+    bio_file::typeToWrite(filename);
+    writeString("##fileformat=VCFv4.2\n");
+    writeString("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n");
 }
 
 vcf_entry::vcf_entry(std::string chr, long start, long end, std::string id, std::string ref, std::vector <std::string> alt, int qual, std::string filter, std::map <std::string, std::string> infos): bio_entry(chr, start, end, '+', id) {
@@ -118,7 +130,7 @@ std::unique_ptr <bio_entry> vcf_file::readLine() {
             throw(std::out_of_range("line doesn't have the right number of elements : " + std::to_string(line.size())));
         }
     } else {
-        throw(std::out_of_range("skipped comment line"));
+        throw(std::invalid_argument("skipped comment line"));
     }
 }
 

@@ -36,6 +36,7 @@ int main(int argc, char *argv[]) {
         std::cout << "\t+d count values by bed identifier\n";
         std::cout << "\t+k id : keep both, source or hit" << std::endl;
         std::cout << "\t+s count values by strand (hit & result)\n";
+		std::cout << "\t+v only match same strand\n";
         std::cout << "\t+p start/stop/mid/whole\n";
         std::cout << "\t+c save results by chromosome\n";
         throw;
@@ -96,6 +97,14 @@ int main(int argc, char *argv[]) {
     } catch(std::out_of_range) {
         std::cout << "won't keep strand" << std::endl;
     }
+	
+	bool only_strand(false);
+    try {
+        args.at('v');
+        only_strand = true;
+    } catch(std::out_of_range) {
+        std::cout << "won't keep strand" << std::endl;
+    }
 
     enum type_count {whole, start, stop, mid}; // what shall we count : full interval ? only start / stop ? Only the middle ?
     type_count count(type_count::whole);
@@ -137,7 +146,7 @@ int main(int argc, char *argv[]) {
         } else {
             ints_to_count.readWholeFile();
         }
-        results = AOEs.intersect(ints_to_count, count_strand, status);
+        results = AOEs.intersect(ints_to_count, only_strand, status);
         
         for(const auto& entry: results) {
             if (chromosome != "" && count_by_chromosome && chromosome != entry.source -> getChr()) {
@@ -157,7 +166,7 @@ int main(int argc, char *argv[]) {
 				key += "\t";
             }
             if(count_strand) {
-                key += entry.source->getStrand();
+                key += entry.source -> getStrand();
                 key += "\t";
                 key += entry.hit -> getStrand();
 				key += "\t";

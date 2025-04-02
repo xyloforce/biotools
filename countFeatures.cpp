@@ -12,6 +12,7 @@ void write_results(std::string output_filename, std::map <std::string, std::map 
 				output_file << idToMap.first;
             }
             output_file << std::to_string(posToMap.first) + "\t" + std::to_string(posToMap.second) + "\n";
+			// id : pos : value
         }
     }
     values_map.clear(); // empty the container bc contents have been written
@@ -153,7 +154,7 @@ int main(int argc, char *argv[]) {
                 if(key.find("._") == 0) {
                     key = key.erase(0, 2);
                 }
-				key += "\t"
+				key += "\t";
             }
             if(count_strand) {
                 key += entry.source->getStrand();

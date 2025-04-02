@@ -8,14 +8,8 @@ void write_results(std::string output_filename, std::map <std::string, std::map 
     std::ofstream output_file(output_filename);
     for (const auto& idToMap : values_map) { // pair id:map
         for (const auto& posToMap : idToMap.second) { // pair strand source : map
-            /*if(count_ids) {
-                tmp += idToMap.first + "\t";
-            }
-            if(count_strand) {
-                tmp += std::string(1, strandSourceToMap.first) + "\t" + std::string(1, strandHitToMap.first) + "\t";
-            }*/
             if (idToMap.first != "") {
-				output_file << idToMap.first + "\t";
+				output_file << idToMap.first;
             }
             output_file << std::to_string(posToMap.first) + "\t" + std::to_string(posToMap.second) + "\n";
         }
@@ -159,12 +153,13 @@ int main(int argc, char *argv[]) {
                 if(key.find("._") == 0) {
                     key = key.erase(0, 2);
                 }
+				key += "\t"
             }
             if(count_strand) {
-                key += "\t";
                 key += entry.source->getStrand();
                 key += "\t";
                 key += entry.hit -> getStrand();
+				key += "\t";
             }
 
             if(count == type_count::whole) {

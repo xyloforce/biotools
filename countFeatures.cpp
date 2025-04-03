@@ -163,6 +163,16 @@ int main(int argc, char *argv[]) {
                 if(key.find("._") == 0) {
                     key = key.erase(0, 2);
                 }
+				if(key == ".") { // if i asked for an id it would be nice to have a real one
+                    key = ""; // delete the point bc we don't need it
+                    if(status == source) {
+                        key += entry.source -> getChr() + std::to_string(entry.source -> getStart()) + std::to_string(entry.source -> getEnd());
+                    } else if(status == hit) {
+                        key += entry.hit -> getChr() + std::to_string(entry.hit -> getStart()) + std::to_string(entry.hit -> getEnd());
+                    } else {
+                        key += entry.result.getChr() + std::to_string(entry.result.getStart()) + std::to_string(entry.result.getEnd());
+                    }
+                }
 				key += "\t";
             }
             if(count_strand) {

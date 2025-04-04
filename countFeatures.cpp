@@ -160,8 +160,9 @@ int main(int argc, char *argv[]) {
             char strand_hit('+');*/
             if(count_ids) {
                 key += entry.result.getID();
-                if(key.find("._") == 0) {
+                if(key.find("._") == 0) { // set to "both" but source has no id
                     key = key.erase(0, 2);
+                    key = entry.source -> getChr() + std::to_string(entry.source -> getStart()) + std::to_string(entry.source -> getEnd()) + "." + key;
                 }
 				if(key == ".") { // if i asked for an id it would be nice to have a real one
                     key = ""; // delete the point bc we don't need it

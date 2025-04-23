@@ -18,6 +18,8 @@ void write_results(std::string output_filename, std::map <std::string, std::map 
     values_map.clear(); // empty the container bc contents have been written
 }
 
+// FIXME extract arg parsing logic to be in a dedicated function and return a map of string:bool to refer in code
+
 int main(int argc, char *argv[]) {
     std::map <char, std::string> args = getArgs(std::vector<std::string>(argv, argv + argc));
     std::string bed_filename, AOE_filename, output_filename;
@@ -34,11 +36,12 @@ int main(int argc, char *argv[]) {
         std::cout << "\t+m save memory but slower\n";
         std::cout << "\t+i number of lines to load at a time\n";
         std::cout << "\t+d count values by bed identifier\n";
-        std::cout << "\t+k id : keep both, source or hit" << std::endl;
+        std::cout << "\t+k id : keep both, source or hit\n";
         std::cout << "\t+s count values by strand (hit & result)\n";
 		std::cout << "\t+v only match same strand\n";
         std::cout << "\t+p start/stop/mid/whole\n";
         std::cout << "\t+c save results by chromosome\n";
+        std::cout << "\t+f filter bigger than -10000 / +10000\n";
         throw;
     }
     
@@ -125,6 +128,14 @@ int main(int argc, char *argv[]) {
     } catch(std::out_of_range) {
         std::cout << "Counting for whole interval" << std::endl;
     }
+
+    bool filter_10000(false);
+    try {
+        args.at('f');
+        filter_10000 = true;
+    } catch(std::out_of_range) {
+        // arg is unset = we don't do anything
+    }
     
     std::cout << "Loading AOE" << std::endl;
     AOE_file AOEs(AOE_filename, read);
@@ -185,22 +196,41 @@ int main(int argc, char *argv[]) {
 
             if(count == type_count::whole) {
                 for(int i(entry.result.getStart()); i < entry.result.getEnd(); i++) {
-                    summed_values[key][dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(i)] ++;
+                    int pos(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(i));
+                    if((pos > -10000 & pos < 10000) | (!filter_10000)) {
+                        summed_values[key][pos] ++;
+                    }
+
                 }
             } else if(count == type_count::start) {
                 if(entry.hit -> getStrand() == '+') {
-                    summed_values[key][dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getStart())] ++;
+                    int start(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getStart()));
+                    if((start > -10000 & start < 10000) | (!filter_10000)) {
+                        summed_values[key][start] ++;
+                    }
                 } else {
-                    summed_values[key][dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getEnd())] ++;
+                    int end(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getEnd()));
+                    if((end > -10000 & end < 10000) | (!filter_10000)) {
+                        summed_values[key][end] ++;
+                    }
                 }
             } else if(count == type_count::stop) {
                 if(entry.hit -> getStrand() == '-') {
-                    summed_values[key][dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getStart())] ++;
+                    int start(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getStart()));
+                    if((start > -10000 & start < 10000) | (!filter_10000)) {
+                        summed_values[key][start] ++;
+                    }
                 } else {
-                    summed_values[key][dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getEnd())] ++;
+                    int end(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getEnd()));
+                    if((end > -10000 & end < 10000) | (!filter_10000)) {
+                        summed_values[key][end] ++;
+                    }
                 }
             } else if(count == type_count::mid) {
-                summed_values[key][dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos((entry.hit->getStart() + entry.hit->getEnd())/2)] ++;
+                int middle(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos((entry.hit->getStart() + entry.hit->getEnd())/2));
+                if((middle > -10000 & middle < 10000) | (!filter_10000)) {
+                    summed_values[key][middle] ++;
+                }
             }
         }
     }    

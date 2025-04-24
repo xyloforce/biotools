@@ -126,8 +126,8 @@ std::unique_ptr <bio_entry> AOE_file::readLine() {
     return std::make_unique <AOE_entry>(entry);
 }
 
-int AOE_entry::getRelativePos(int pos) const {
-    int returned(pos - m_zero);
+long AOE_entry::getRelativePos(long pos) const {
+    long returned(pos - m_zero);
     if(m_strand == '-') {
         returned = returned * -1;
     }

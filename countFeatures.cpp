@@ -4,7 +4,7 @@
 
 // FIXME implement correctly saving by chromosome : change FILENAME
 
-void write_results(std::string output_filename, std::map <std::string, std::map <int, int>> &values_map) {
+void write_results(std::string output_filename, std::map <std::string, std::map <long, int>> &values_map) {
     std::ofstream output_file(output_filename);
     for (const auto& idToMap : values_map) { // pair id:map
         for (const auto& posToMap : idToMap.second) { // pair strand source : map
@@ -16,6 +16,16 @@ void write_results(std::string output_filename, std::map <std::string, std::map 
         }
     }
     values_map.clear(); // empty the container bc contents have been written
+}
+
+bool in_hit(long pos, const bio_entry *source) {
+    long start = source -> getStart();
+    long end = source -> getEnd();
+    if (start < pos && end > pos) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 // FIXME extract arg parsing logic to be in a dedicated function and return a map of string:bool to refer in code
@@ -143,7 +153,7 @@ int main(int argc, char *argv[]) {
 
     //std::ofstream output_file(output_filename);
     //std::map <std::string, std::map <char, std::map <char, std::map<int, int>>>> summed_values;
-    std::map <std::string, std::map <int, int>> summed_values;
+    std::map <std::string, std::map <long, int>> summed_values;
 
     std::cout << "Loading bed" << std::endl;
     bed_file ints_to_count(bed_filename, read);
@@ -166,9 +176,7 @@ int main(int argc, char *argv[]) {
             }
             chromosome = entry.source -> getChr();
             std::string key("");
-            /*std::string id("no_id");
-            char strand_source('+');
-            char strand_hit('+');*/
+
             if(count_ids) {
                 key += entry.result.getID();
                 if(key.find("._") == 0) { // set to "both" but source has no id
@@ -196,40 +204,44 @@ int main(int argc, char *argv[]) {
 
             if(count == type_count::whole) {
                 for(int i(entry.result.getStart()); i < entry.result.getEnd(); i++) {
-                    int pos(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(i));
-                    if((pos > -10000 & pos < 10000) | (!filter_10000)) {
+                    long pos(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(i));
+                    if(((pos > -10000 && pos < 10000) || (!filter_10000)) && in_hit(i, &entry.result)) {
                         summed_values[key][pos] ++;
                     }
-
                 }
             } else if(count == type_count::start) {
                 if(entry.hit -> getStrand() == '+') {
-                    int start(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getStart()));
-                    if((start > -10000 & start < 10000) | (!filter_10000)) {
+                    long start(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getStart()));
+                    if(((start > -10000 && start < 10000) || (!filter_10000)) && in_hit(entry.hit->getStart(), &entry.result)) {
                         summed_values[key][start] ++;
                     }
                 } else {
-                    int end(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getEnd()));
-                    if((end > -10000 & end < 10000) | (!filter_10000)) {
+                    long end(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getEnd()));
+                    if(((end > -10000 && end < 10000) || (!filter_10000)) && in_hit(entry.hit->getEnd(), &entry.result)) {
                         summed_values[key][end] ++;
                     }
                 }
             } else if(count == type_count::stop) {
                 if(entry.hit -> getStrand() == '-') {
-                    int start(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getStart()));
-                    if((start > -10000 & start < 10000) | (!filter_10000)) {
+                    long start(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getStart()));
+                    if(((start > -10000 && start < 10000) || (!filter_10000)) && in_hit(entry.hit->getStart(), &entry.result)) {
                         summed_values[key][start] ++;
                     }
                 } else {
-                    int end(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getEnd()));
-                    if((end > -10000 & end < 10000) | (!filter_10000)) {
+                    long end(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getEnd()));
+                    if(((end > -10000 && end < 10000) || (!filter_10000)) && in_hit(entry.hit->getEnd(), &entry.result)) {
                         summed_values[key][end] ++;
                     }
                 }
             } else if(count == type_count::mid) {
-                int middle(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos((entry.hit->getStart() + entry.hit->getEnd())/2));
-                if((middle > -10000 & middle < 10000) | (!filter_10000)) {
-                    summed_values[key][middle] ++;
+                long middle = (entry.hit->getStart() + entry.hit->getEnd())/2;
+                long rel_middle(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(middle));
+                // if(middle < 0) {
+                //     std::cout << middle << std::endl;
+                //     std::cout << entry.hit->getStart() + middle << std::endl;
+                // }
+                if(((rel_middle > -10000 && rel_middle < 10000) || (!filter_10000)) && in_hit(middle, &entry.result)) {
+                    summed_values[key][rel_middle] ++;
                 }
             }
         }

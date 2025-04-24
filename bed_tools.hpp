@@ -37,7 +37,7 @@ class AOE_entry: public bed_entry {
 
     // getters
         int getZero();
-        int getRelativePos(int pos) const;
+        long getRelativePos(long pos) const;
         virtual std::string getString() const;
 
     // functions

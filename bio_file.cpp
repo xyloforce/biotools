@@ -67,7 +67,8 @@ void bio_file::readWholeFile() {
                 throw;
             }
         } catch(const std::invalid_argument) {
-            // nothing : skipped comment line
+            std::cout << "this code was recently changed and before skipped errors: however it also hid start > end errors from bed files" << std::endl;
+            throw;
         }
     }
 }

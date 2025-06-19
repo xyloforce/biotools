@@ -21,7 +21,7 @@ void write_results(std::string output_filename, std::map <std::string, std::map 
 bool in_hit(long pos, const bio_entry *source) {
     long start = source -> getStart();
     long end = source -> getEnd();
-    if (start < pos && end > pos) {
+    if (start <= pos && end > pos) {
         return true;
     } else {
         return false;
@@ -139,10 +139,11 @@ int main(int argc, char *argv[]) {
         std::cout << "Counting for whole interval" << std::endl;
     }
 
-    bool filter_10000(false);
+    //bool filter_10000(false);
     try {
         args.at('f');
-        filter_10000 = true;
+        throw("argument is disabled, forget about it");
+        //filter_10000 = true;
     } catch(std::out_of_range) {
         // arg is unset = we don't do anything
     }
@@ -205,31 +206,30 @@ int main(int argc, char *argv[]) {
             if(count == type_count::whole) {
                 for(int i(entry.result.getStart()); i < entry.result.getEnd(); i++) {
                     long pos(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(i));
-                    if(((pos > -10000 && pos < 10000) || (!filter_10000)) && in_hit(i, &entry.result)) {
+                    if(in_hit(i, entry.source)) { // just in case : ((pos > -10000 && pos < 10000) || (!filter_10000)) &&
                         summed_values[key][pos] ++;
                     }
                 }
             } else if(count == type_count::start) {
                 if(entry.hit -> getStrand() == '+') {
                     long start(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getStart()));
-                    if(((start > -10000 && start < 10000) || (!filter_10000)) && in_hit(entry.hit->getStart(), &entry.result)) {
+                    if(in_hit(entry.hit -> getStart(), entry.source)) {
                         summed_values[key][start] ++;
                     }
                 } else {
                     long end(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getEnd()));
-                    if(((end > -10000 && end < 10000) || (!filter_10000)) && in_hit(entry.hit->getEnd(), &entry.result)) {
+                    if(in_hit(entry.hit -> getEnd(), entry.source)) {
                         summed_values[key][end] ++;
                     }
                 }
             } else if(count == type_count::stop) {
                 if(entry.hit -> getStrand() == '-') {
-                    long start(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getStart()));
-                    if(((start > -10000 && start < 10000) || (!filter_10000)) && in_hit(entry.hit->getStart(), &entry.result)) {
+                    if(in_hit(entry.hit -> getEnd(), entry.source)) {
                         summed_values[key][start] ++;
                     }
                 } else {
                     long end(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getEnd()));
-                    if(((end > -10000 && end < 10000) || (!filter_10000)) && in_hit(entry.hit->getEnd(), &entry.result)) {
+                    if(in_hit(entry.hit -> getStart(), entry.source)) {
                         summed_values[key][end] ++;
                     }
                 }
@@ -240,7 +240,7 @@ int main(int argc, char *argv[]) {
                 //     std::cout << middle << std::endl;
                 //     std::cout << entry.hit->getStart() + middle << std::endl;
                 // }
-                if(((rel_middle > -10000 && rel_middle < 10000) || (!filter_10000)) && in_hit(middle, &entry.result)) {
+                if(in_hit(middle, entry.source)) {
                     summed_values[key][rel_middle] ++;
                 }
             }

@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
     //bool filter_10000(false);
     try {
         args.at('f');
-        throw("argument is disabled, forget about it");
+        throw std::invalid_argument("argument has been deprecated");
         //filter_10000 = true;
     } catch(std::out_of_range) {
         // arg is unset = we don't do anything
@@ -224,11 +224,12 @@ int main(int argc, char *argv[]) {
                 }
             } else if(count == type_count::stop) {
                 if(entry.hit -> getStrand() == '-') {
+                    long end(dynamic_cast<AOE_entry*>(entry.source)->getRelativePos(entry.hit->getStart()));
                     if(in_hit(entry.hit -> getEnd(), entry.source)) {
-                        summed_values[key][start] ++;
+                        summed_values[key][end] ++;
                     }
                 } else {
-                    long end(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getEnd()));
+                    long end(dynamic_cast<AOE_entry*>(entry.source)->getRelativePos(entry.hit->getEnd()));
                     if(in_hit(entry.hit -> getStart(), entry.source)) {
                         summed_values[key][end] ++;
                     }

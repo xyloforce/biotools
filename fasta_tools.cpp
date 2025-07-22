@@ -206,7 +206,7 @@ std::map<int, std::vector<std::shared_ptr <bio_entry>>> fasta_entry::matchPatter
                     if((i - start_true) % 2 != 0) {
                         end_true --;
                     }
-                    results[0].push_back(std::make_shared <bio_entry>(bio_entry(m_chr, start_true, end_true, '+', "CG")));
+                    results[0].push_back(std::make_shared <bio_entry>(bio_entry(m_chr, start_true, end_true, '+', pattern)));
                 }
                 if(m_sequence[i] != 'N' & m_sequence[i] != pattern[(i - start_true) % 2]) {
                     not_non = false;
@@ -225,7 +225,7 @@ std::map<int, std::vector<std::shared_ptr <bio_entry>>> fasta_entry::matchPatter
                 }
                 if((m_sequence[i] == pattern[0] | m_sequence[i] == 'N') & (m_sequence[i + 1] == pattern[1] | m_sequence[i + 1] == 'N')) {
                     not_non = true;
-                    results[1].push_back(std::make_shared <bio_entry>(bio_entry(m_chr, start_non, i, '+', "nCG")));
+                    results[1].push_back(std::make_shared <bio_entry>(bio_entry(m_chr, start_non, i, '+', "n" + pattern)));
                     phase_non = i;
                 }
             }

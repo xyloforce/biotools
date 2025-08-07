@@ -225,12 +225,12 @@ int main(int argc, char *argv[]) {
             } else if(count == type_count::stop) {
                 if(entry.hit -> getStrand() == '-') {
                     long end(dynamic_cast<AOE_entry*>(entry.source)->getRelativePos(entry.hit->getStart()));
-                    if(in_hit(entry.hit -> getEnd(), entry.source)) {
+                    if(in_hit(entry.hit ->getStart(), entry.source)) { // check first bc if TE overlap multiple aoes only one of them has the true end
                         summed_values[key][end] ++;
                     }
                 } else {
                     long end(dynamic_cast<AOE_entry*>(entry.source)->getRelativePos(entry.hit->getEnd()));
-                    if(in_hit(entry.hit -> getStart(), entry.source)) {
+                    if(in_hit(entry.hit -> getEnd(), entry.source)) {
                         summed_values[key][end] ++;
                     }
                 }

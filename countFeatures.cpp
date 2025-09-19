@@ -19,9 +19,9 @@ void write_results(std::string output_filename, std::map <std::string, std::map 
 }
 
 bool in_hit(long pos, const bio_entry *source) {
-    long start = source -> getStart();
-    long end = source -> getEnd();
-    if (start <= pos && end > pos) {
+    long source_start = source -> getStart();
+    long source_end = source -> getEnd();
+    if (source_start <= pos && source_end >= pos) {
         return true;
     } else {
         return false;
@@ -212,20 +212,20 @@ int main(int argc, char *argv[]) {
                 }
             } else if(count == type_count::start) {
                 if(entry.hit -> getStrand() == '+') {
-                    long start(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getStart()));
+                    long start(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit -> getStart()));
                     if(in_hit(entry.hit -> getStart(), entry.source)) {
                         summed_values[key][start] ++;
                     }
                 } else {
-                    long end(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit->getEnd()));
+                    long end(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit -> getEnd()));
                     if(in_hit(entry.hit -> getEnd(), entry.source)) {
                         summed_values[key][end] ++;
                     }
                 }
             } else if(count == type_count::stop) {
-                if(entry.hit -> getStrand() == '-') {
-                    long end(dynamic_cast<AOE_entry*>(entry.source)->getRelativePos(entry.hit->getStart()));
-                    if(in_hit(entry.hit ->getStart(), entry.source)) { // check first bc if TE overlap multiple aoes only one of them has the true end
+                if(entry.hit -> getStrand() == '-') { // TE is reverse: start is end
+                    long end(dynamic_cast<AOE_entry*>(entry.source) -> getRelativePos(entry.hit -> getStart()));
+                    if(in_hit(entry.hit -> getStart(), entry.source)) { // check first bc if TE overlap multiple aoes only one of them contain the true end
                         summed_values[key][end] ++;
                     }
                 } else {

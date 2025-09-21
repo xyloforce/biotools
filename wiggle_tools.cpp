@@ -21,7 +21,7 @@ std::unique_ptr <bio_entry> wiggle_file::readLine() {
 
     while(remainToRead() && continue_reading) {
         tchar = getChar();
-        if(is_track) {
+        if(is_track) { // first there is a track IF THERE IS NO TRACK ADD IT
             if((tchar == ' ' && !is_inside_quotes) || tchar == '\n') {
                 is_key = true;
                 if(value != "") {
@@ -30,8 +30,8 @@ std::unique_ptr <bio_entry> wiggle_file::readLine() {
                     value = "";
                 }
                 if(tchar == '\n') {
-                    is_def = true;
                     is_track = false;
+                    is_def = true;
                 }
             } else if(tchar == '"') {
                 is_inside_quotes = !is_inside_quotes;
@@ -42,8 +42,8 @@ std::unique_ptr <bio_entry> wiggle_file::readLine() {
             } else {
                 value += tchar;
             }
-        } else if(is_def) {
-            if(tchar == ' ' || tchar == '\n') {
+        } else if(is_def) { // its followed by a def line
+            if (tchar == ' ' || tchar == '\t' || tchar == '\n') {
                 if(key == "fixedStep" || key == "variableStep") {
                     is_fixed = (key == "fixedStep");
                     is_key = true;
@@ -79,16 +79,16 @@ std::unique_ptr <bio_entry> wiggle_file::readLine() {
             } else {
                 value += tchar;
             }
-        } else { // not a def or a track : either it's a numeric value or the start of a new track
+        } else { // not a def or a track : either it's a numeric value or the start of a new int
             if(tchar == '\n') {
                 try {
-                    if(peek() == 't') {
+                    if(peek() == 't') { // if a step has no track header FUCKIN FIX IT
                         continue_reading = false;
                     }
-                    if(std::stod(s_value) > 1) {
+                    /*if(std::stod(s_value) > 1) {
                         std::cout << "error : " << s_value << std::endl;
                         throw(666);
-                    }
+                    } why the hell did i wrote that here ???? */
                     if(!is_fixed) {
                         if(past_pos != 0) {
                             for(int i(0); i < (std::stoi(s_pos) - past_pos - 1); i++) { // same shit than below
@@ -97,7 +97,7 @@ std::unique_ptr <bio_entry> wiggle_file::readLine() {
                         } else {
                             start = std::stol(s_pos) - 1; // wig are 1-based
                         }
-                        past_pos = std::stoi(s_pos);
+                        past_pos = std::stol(s_pos);
                         is_key = true;
                     } else {
                         if(values.size() != 0) {
@@ -114,7 +114,7 @@ std::unique_ptr <bio_entry> wiggle_file::readLine() {
                 s_value = "";
                 s_pos = "";
             } if(!is_fixed) {
-                if(tchar == ' ') {
+                if(tchar == ' ' || tchar == '\t') {
                     is_key = false;
                 } else if(is_key) {
                     s_pos += tchar;
